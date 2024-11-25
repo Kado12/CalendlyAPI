@@ -9,12 +9,12 @@ app.use(express.urlencoded({ extended: true }))
 
 app.get('/', async (req, res) => {
 
-  let disponibles = await getAvailability('25/11/2024', '05:00', '16:00', 'Cerrador 1')
+  let disponibles = await getAvailability('25/11/2024', '12:00', '16:00', 'Cerrador 1')
   console.log(disponibles)
   // Define los parámetros que quieres enviar
-  const endTime = '2024-11-26T24:00:00.000000Z';
+  const endTime = '2024-11-27T24:00:00.000000Z';
   const eventType = 'https://api.calendly.com/event_types/85c16b72-de3c-42f9-a411-c680ba7cfc76';
-  const startTime = '2024-11-26T00:00:00.000000Z';
+  const startTime = '2024-11-27T00:00:00.000000Z';
 
   // Crea una cadena de consulta con los parámetros
   const params = new URLSearchParams({
@@ -60,35 +60,25 @@ async function getAvailability(fecha_agendar, hora_cliente, hora_agendar, asesor
   const hora_agendar_existe = (hora_agendar.length > 0)
   let disponibilidad = false
   let fechas_disponibles
-  console.log(current_day)
-  console.log(current_day_ISO)
-  console.log(isoTime)
-  console.log(fecha_agendar_ISO == isoDay)
-
-  console.log(fecha_agendar_ISO)
   let new_fecha_agendar = `${fecha_agendar_ISO.split('-')[0]}-${fecha_agendar_ISO.split('-')[1]}-${Number(fecha_agendar_ISO.split('-')[2]) + 1}`
-
+  console.log(fecha_agendar_ISO, isoDay)
   if (fecha_agendar_ISO == isoDay || current_day_ISO < `${isoDay}T05:00:00.000000Z`) {
-    if (fecha_agendar_ISO != isoDay) {
-      new_fecha_agendar = ''
-    }
     if (asesor = 'Cerrador 1') {
-      fechas_disponibles = await buscarFechasDisponibles(`${isoDay}T${isoTimeAdd}.00.000000Z`, `${new_fecha_agendar || isoDay}T05:00:00.000000Z`, differenceHours, process.env.URI_HOLOS_EVENTS)
+      fechas_disponibles = await buscarFechasDisponibles(`${isoDay}T${isoTimeAdd}:00.000000Z`, `${new_fecha_agendar}T05:00:00.000000Z`, differenceHours, process.env.URI_HOLOS_EVENTS)
       if (fechas_disponibles.collection.length != 0) {
         disponibilidad = true
       } else {
-        fechas_disponibles = await buscarFechasDisponibles(`${isoDay}T${isoTimeAdd}.00.000000Z`, `${new_fecha_agendar || isoDay}T05:00:00.000000Z`, differenceHours, process.env.URI_DEMO_EVENTS)
+        fechas_disponibles = await buscarFechasDisponibles(`${isoDay}T${isoTimeAdd}:00.000000Z`, `${new_fecha_agendar}T05:00:00.000000Z`, differenceHours, process.env.URI_DEMO_EVENTS)
         if (fechas_disponibles.collection.length != 0) {
           disponibilidad = true
         }
       }
-
     } else if (asesor = 'Cerrador 2') {
-      fechas_disponibles = await buscarFechasDisponibles(`${isoDay}T${isoTimeAdd}.00.000000Z`, `${new_fecha_agendar || isoDay}T05:00:00.000000Z`, differenceHours, process.env.URI_DEMO_EVENTS)
+      fechas_disponibles = await buscarFechasDisponibles(`${isoDay}T${isoTimeAdd}:00.000000Z`, `${new_fecha_agendar}T05:00:00.000000Z`, differenceHours, process.env.URI_DEMO_EVENTS)
       if (fechas_disponibles.collection.length != 0) {
         disponibilidad = true
       } else {
-        fechas_disponibles = await buscarFechasDisponibles(`${isoDay}T${isoTimeAdd}.00.000000Z`, `${new_fecha_agendar || isoDay}T05:00:00.000000Z`, differenceHours, process.env.URI_DEMO_EVENTS)
+        fechas_disponibles = await buscarFechasDisponibles(`${isoDay}T${isoTimeAdd}:00.000000Z`, `${new_fecha_agendar}T05:00:00.000000Z`, differenceHours, process.env.URI_DEMO_EVENTS)
         if (fechas_disponibles.collection.length != 0) {
           disponibilidad = true
         }
@@ -98,33 +88,59 @@ async function getAvailability(fecha_agendar, hora_cliente, hora_agendar, asesor
       console.log(fechas_disponibles)
       return
     }
-    new_fecha_agendar = `${fecha_agendar_ISO.split('-')[0]}-${fecha_agendar_ISO.split('-')[1]}-${Number(fecha_agendar_ISO.split('-')[2]) + 1}`
   }
-
-  while (disponibilidad = false) {
+  if (fecha_agendar_ISO != isoDay || current_day_ISO >= `${isoDay}T05:00:00.000000Z`) {
     if (asesor = 'Cerrador 1') {
-      fechas_disponibles = await buscarFechasDisponibles(`${fecha_agendar_ISO}T06:00.00.000000Z`, `${new_fecha_agendar}T05:00:00.000000Z`, differenceHours, process.env.URI_HOLOS_EVENTS)
+      fechas_disponibles = await buscarFechasDisponibles(`${fecha_agendar_ISO}T06:00:00.000000Z`, `${new_fecha_agendar}T05:00:00.000000Z`, differenceHours, process.env.URI_HOLOS_EVENTS)
       if (fechas_disponibles.collection.length != 0) {
         disponibilidad = true
       } else {
-        fechas_disponibles = await buscarFechasDisponibles(`${fecha_agendar_ISO}T06:00.00.000000Z`, `${new_fecha_agendar}T05:00:00.000000Z`, differenceHours, process.env.URI_DEMO_EVENTS)
+        fechas_disponibles = await buscarFechasDisponibles(`${fecha_agendar_ISO}T06:00:00.000000Z`, `${new_fecha_agendar}T05:00:00.000000Z`, differenceHours, process.env.URI_DEMO_EVENTS)
         if (fechas_disponibles.collection.length != 0) {
           disponibilidad = true
         }
       }
-
     } else if (asesor = 'Cerrador 2') {
-      fechas_disponibles = await buscarFechasDisponibles(`${fecha_agendar_ISO}T06:00.00.000000Z`, `${new_fecha_agendar}T05:00:00.000000Z`, differenceHours, process.env.URI_DEMO_EVENTS)
+      fechas_disponibles = await buscarFechasDisponibles(`${fecha_agendar_ISO}T06:00:00.000000Z`, `${new_fecha_agendar}T05:00:00.000000Z`, differenceHours, process.env.URI_DEMO_EVENTS)
       if (fechas_disponibles.collection.length != 0) {
         disponibilidad = true
       } else {
-        fechas_disponibles = await buscarFechasDisponibles(`${fecha_agendar_ISO}T06:00.00.000000Z`, `${new_fecha_agendar}T05:00:00.000000Z`, differenceHours, process.env.URI_DEMO_EVENTS)
+        fechas_disponibles = await buscarFechasDisponibles(`${fecha_agendar_ISO}T06:00:00.000000Z`, `${new_fecha_agendar}T05:00:00.000000Z`, differenceHours, process.env.URI_DEMO_EVENTS)
         if (fechas_disponibles.collection.length != 0) {
           disponibilidad = true
         }
       }
     }
+    if (disponibilidad) {
+      console.log(fechas_disponibles)
+      return
+    }
   }
+
+  // while (disponibilidad = false) {
+  //   if (asesor = 'Cerrador 1') {
+  //     fechas_disponibles = await buscarFechasDisponibles(`${fecha_agendar_ISO}T06:00.00.000000Z`, `${new_fecha_agendar}T05:00:00.000000Z`, differenceHours, process.env.URI_HOLOS_EVENTS)
+  //     if (fechas_disponibles.collection.length != 0) {
+  //       disponibilidad = true
+  //     } else {
+  //       fechas_disponibles = await buscarFechasDisponibles(`${fecha_agendar_ISO}T06:00.00.000000Z`, `${new_fecha_agendar}T05:00:00.000000Z`, differenceHours, process.env.URI_DEMO_EVENTS)
+  //       if (fechas_disponibles.collection.length != 0) {
+  //         disponibilidad = true
+  //       }
+  //     }
+
+  //   } else if (asesor = 'Cerrador 2') {
+  //     fechas_disponibles = await buscarFechasDisponibles(`${fecha_agendar_ISO}T06:00.00.000000Z`, `${new_fecha_agendar}T05:00:00.000000Z`, differenceHours, process.env.URI_DEMO_EVENTS)
+  //     if (fechas_disponibles.collection.length != 0) {
+  //       disponibilidad = true
+  //     } else {
+  //       fechas_disponibles = await buscarFechasDisponibles(`${fecha_agendar_ISO}T06:00.00.000000Z`, `${new_fecha_agendar}T05:00:00.000000Z`, differenceHours, process.env.URI_DEMO_EVENTS)
+  //       if (fechas_disponibles.collection.length != 0) {
+  //         disponibilidad = true
+  //       }
+  //     }
+  //   }
+  // }
 
   console.log(fechas_disponibles)
   return
@@ -191,12 +207,22 @@ async function calculateHourDifference(hora_cliente, isoTime) {
 
 // Función para aumentar las horas en el JSON
 async function updateStartTime(data, hours) {
+  console.log(hours)
+  console.log(data)
   const updatedCollection = data.collection.map(item => {
     const startTime = new Date(item.start_time); // Convertir a objeto Date
+
     startTime.setHours(startTime.getHours() + hours); // Aumentar las horas
+    const day = startTime.toISOString().split('T')[0]
+    const formattedDay = `${day.split('-')[2]}/${day.split('-')[1]}/${day.split('-')[0]}`
+    const hour = startTime.toISOString().split('T')[1]
+    const formattedHour = hour.slice(0, 5)
+    console.log(formattedDay, formattedHour)
+
+    // Formatear la fecha a 'HH:mm - dd/mm/yyyy'
+    const formattedTime = `${formattedDay} - ${formattedHour}`;
     return {
-      ...item, // Mantener el resto de las propiedades
-      start_time: startTime.toISOString() // Actualizar el start_time
+      date: formattedTime // Solo mantener el start_time formateado
     };
   });
 
